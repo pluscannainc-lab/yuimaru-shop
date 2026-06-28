@@ -85,9 +85,15 @@ header{background:linear-gradient(135deg,#005f8a 0%,#0077b6 60%,#00b4d8 100%);co
 .empty-state{text-align:center;padding:64px 20px;color:var(--muted);}
 .empty-state svg{width:64px;height:64px;opacity:.3;margin-bottom:12px;display:block;margin:0 auto 12px;}
 .empty-state p{font-size:16px;}
-dialog{border:none;border-radius:16px;padding:0;width:min(900px,calc(100vw - 24px));max-height:90vh;overflow:hidden;box-shadow:0 30px 80px rgba(0,40,80,.28);}
-dialog::backdrop{background:rgba(0,30,50,.6);}
-.modal-layout{display:grid;grid-template-columns:1fr 1fr;max-height:90vh;overflow:hidden;}
+/* バックドロップ */
+#modalBackdrop{display:none;position:fixed;inset:0;background:rgba(0,30,50,.6);z-index:900;}
+/* モーダル本体 */
+#modal{display:none;position:fixed;z-index:901;background:#fff;box-shadow:0 30px 80px rgba(0,40,80,.28);}
+/* デスクトップ：中央寄せ */
+@media(min-width:769px){
+  #modal{top:50%;left:50%;transform:translate(-50%,-50%);width:min(900px,calc(100vw - 24px));height:min(90vh,700px);border-radius:16px;overflow:hidden;}
+}
+.modal-layout{display:grid;grid-template-columns:1fr 1fr;height:100%;overflow:hidden;}
 .modal-imgs{background:#0a1628;position:relative;display:flex;flex-direction:column;}
 .modal-main-img{width:100%;flex:1;object-fit:cover;display:block;min-height:0;}
 .modal-thumbs{display:flex;gap:6px;padding:8px;overflow-x:auto;background:#0d1f35;flex-shrink:0;}
@@ -155,17 +161,13 @@ footer strong{color:rgba(255,255,255,.9);}
      flex は Safari で壊れるため完全廃止
      ============================== */
 
-  /* 1. dialog = 画面全体の固定コンテナ（display:block のまま） */
-  dialog{
-    position:fixed !important;
+  /* 1. モーダル = 画面全体の固定コンテナ */
+  #modal{
     top:0 !important; left:0 !important;
     right:0 !important; bottom:0 !important;
     width:100vw !important; height:100vh !important;
-    max-width:100vw !important; max-height:100vh !important;
-    border-radius:0 !important; margin:0 !important; padding:0 !important;
+    border-radius:0 !important; transform:none !important;
     overflow:hidden !important; box-shadow:none !important;
-    background:#fff !important;
-    display:block !important;          /* flex は使わない */
   }
 
   /* 2. 上部バー：absolute で最上部に固定 */
@@ -351,15 +353,16 @@ footer strong{color:rgba(255,255,255,.9);}
     <p>該当する商品が見つかりません</p>
   </div>
 </div>
-<dialog id="modal">
-  <!-- スマホ用：スクロール外の固定ヘッダー（desktop は非表示） -->
+<!-- バックドロップ -->
+<div id="modalBackdrop"></div>
+<!-- モーダル本体（dialog廃止→divで完全制御） -->
+<div id="modal">
   <div class="modal-topbar">
     <button class="modal-close" id="modalClose">✕ 閉じる</button>
   </div>
   <div class="modal-layout">
     <div class="modal-imgs" id="modalImgs"></div>
     <div class="modal-info">
-      <!-- desktop 用閉じるボタン（スマホでは非表示） -->
       <div class="modal-close-row"><button class="modal-close-desk" id="modalCloseDsk">✕ 閉じる</button></div>
       <div class="modal-vendor" id="modalVendor"></div>
       <div class="modal-name" id="modalName"></div>
@@ -372,7 +375,7 @@ footer strong{color:rgba(255,255,255,.9);}
       <button class="modal-cta" onclick="alert('クロスネクストのショップページで購入できます。')">この商品を注文する</button>
     </div>
   </div>
-</dialog>
+</div>
 <footer>
   <strong>ゆいまーる商店</strong><br>
   本サイトはがん共済アイリスご加入者様向けの商品プレビューページです。<br>
@@ -387,6 +390,9 @@ const grid = document.getElementById('grid');
 const emptyState = document.getElementById('emptyState');
 const resultNum = document.getElementById('resultNum');
 const modal = document.getElementById('modal');
+const backdrop = document.getElementById('modalBackdrop');
+function showModal(){ modal.style.display='block'; backdrop.style.display='block'; document.body.style.overflow='hidden'; }
+function hideModal(){ modal.style.display='none'; backdrop.style.display='none'; document.body.style.overflow=''; }
 
 const vendors = [...new Set(PRODUCTS.map(p => p.vendor))];
 document.getElementById('statTotal').textContent = PRODUCTS.length;
@@ -475,7 +481,7 @@ function openModal(code) {
   document.getElementById('modalDesc').textContent = p.desc || p.shortDesc || '商品説明を準備中です。';
   currentImgs = p.images || []; currentIdx = 0;
   renderModalImgs();
-  try { modal.showModal(); } catch(e) { modal.setAttribute('open',''); }
+  showModal();
 }
 
 function renderModalImgs() {
@@ -495,17 +501,15 @@ grid.addEventListener('click', e => {
   const btn = e.target.closest('[data-code]');
   if (btn) openModal(btn.dataset.code);
 });
-document.getElementById('modalClose').addEventListener('click', () => modal.close());
+document.getElementById('modalClose').addEventListener('click', hideModal);
 const dskBtn = document.getElementById('modalCloseDsk');
-if (dskBtn) dskBtn.addEventListener('click', () => modal.close());
-modal.addEventListener('click', e => { if (e.target === modal) { try { modal.close(); } catch(e2) { modal.removeAttribute('open'); } } });
+if (dskBtn) dskBtn.addEventListener('click', hideModal);
+backdrop.addEventListener('click', hideModal);
 // スマホ：スワイプダウンで閉じる
 let touchStartY = 0;
 modal.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; }, {passive:true});
 modal.addEventListener('touchend', e => {
-  if (e.changedTouches[0].clientY - touchStartY > 80) {
-    try { modal.close(); } catch(e2) { modal.removeAttribute('open'); }
-  }
+  if (e.changedTouches[0].clientY - touchStartY > 80) hideModal();
 }, {passive:true});
 document.getElementById('searchInput').addEventListener('input', e => { state.q = e.target.value.trim(); render(); });
 document.getElementById('sortSelect').addEventListener('change', e => { state.sort = e.target.value; render(); });
