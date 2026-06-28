@@ -1,0 +1,6 @@
+# 業務ファイルはすべて除外（docs/のみ公開）
+*
+!docs/
+!docs/**
+!.gitignore
+!.nojekyll
