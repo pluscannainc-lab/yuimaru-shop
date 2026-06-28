@@ -145,14 +145,59 @@ footer strong{color:rgba(255,255,255,.9);}
   /* グリッド */
   .products-grid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;}
 
-  /* モーダル：縦積み */
-  dialog{width:100%;max-width:100%;border-radius:16px 16px 0 0;position:fixed;bottom:0;left:0;margin:0;}
+  /* モーダル：フルスクリーン */
+  dialog{
+    position:fixed !important;
+    inset:0 !important;
+    width:100% !important;
+    height:100% !important;
+    max-width:100% !important;
+    max-height:100% !important;
+    border-radius:0 !important;
+    margin:0 !important;
+    overflow:hidden !important;
+  }
   dialog::backdrop{background:rgba(0,20,40,.7);}
-  .modal-layout{grid-template-columns:1fr;max-height:92dvh;overflow-y:auto;}
-  .modal-imgs{min-height:0;}
-  .modal-main-img{max-height:52vw;object-fit:cover;}
-  .modal-thumbs{padding:6px;}
-  .modal-info{padding:16px;}
+  .modal-layout{
+    display:flex;
+    flex-direction:column;
+    height:100%;
+    overflow:hidden;
+    grid-template-columns:none;
+  }
+  /* 画像エリア：固定高さ */
+  .modal-imgs{
+    flex-shrink:0;
+    height:240px;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+  }
+  .modal-main-img{
+    flex:1;
+    width:100%;
+    height:0;
+    object-fit:cover;
+  }
+  .modal-thumbs{height:60px;padding:6px;}
+  .modal-thumb{width:44px;height:44px;}
+  /* 情報エリア：残りをスクロール */
+  .modal-info{
+    flex:1;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    padding:14px 16px;
+    gap:10px;
+    display:flex;
+    flex-direction:column;
+  }
+  /* 閉じるボタン：大きく */
+  .modal-close{min-height:40px;padding:0 16px;font-size:14px;}
+  .modal-close-row{margin-bottom:2px;}
+  /* 説明文：スクロール制限を解除 */
+  .modal-desc{max-height:none;flex:1;}
+  /* CTAボタン：常に画面内 */
+  .modal-cta{flex-shrink:0;min-height:48px;font-size:15px;border-radius:8px;}
 }
 
 /* ===== スマートフォン（〜480px） ===== */
@@ -198,14 +243,16 @@ footer strong{color:rgba(255,255,255,.9);}
   .price-pct{font-size:10px;}
   .card-cta{font-size:12px;padding:9px 0;min-height:40px;}
 
-  /* モーダル */
-  .modal-main-img{max-height:56vw;}
-  .modal-thumb{width:44px;height:44px;}
-  .modal-name{font-size:15px;}
-  .modal-price-val.p-red{font-size:16px;}
-  .modal-price-row{grid-template-columns:4em 1fr;font-size:13px;}
-  .modal-desc{font-size:12px;max-height:160px;}
-  .modal-cta{min-height:48px;font-size:14px;}
+  /* モーダル（480px以下追加調整） */
+  .modal-imgs{height:200px;}
+  .modal-name{font-size:14px;line-height:1.4;}
+  .modal-vendor{font-size:11px;}
+  .modal-prices{padding:10px 12px;}
+  .modal-price-val.p-red{font-size:15px;}
+  .modal-price-row{grid-template-columns:3.8em 1fr;font-size:12px;margin-bottom:3px;}
+  .modal-price-row-label{font-size:11px;}
+  .modal-desc{font-size:12px;line-height:1.7;}
+  .modal-cta{font-size:14px;min-height:50px;}
 
   /* フッター */
   footer{padding:20px 14px;font-size:11px;}
