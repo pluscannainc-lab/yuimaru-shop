@@ -179,21 +179,19 @@ footer strong{color:rgba(255,255,255,.9);}
     grid-template-columns:none !important;
   }
 
-  /* 3. 画像エリア */
+  /* 3. 画像エリア：sticky なし・普通にスクロール */
   .modal-imgs{
     display:block !important;
     background:#0a1628;
     width:100%;
     height:auto !important;
-    position:sticky;
-    top:0;
-    z-index:1;
+    position:static !important;
   }
   .modal-main-img{
     display:block !important;
     width:100% !important;
-    height:56vw !important;
-    max-height:280px !important;
+    height:44vw !important;
+    max-height:220px !important;
     object-fit:cover !important;
     flex:none !important;
   }
@@ -310,7 +308,7 @@ footer strong{color:rgba(255,255,255,.9);}
   .card-cta{font-size:12px;padding:9px 0;min-height:40px;}
 
   /* モーダル（480px追加） */
-  .modal-main-img{height:52vw !important;}
+  .modal-main-img{height:46vw !important;max-height:200px !important;}
   .modal-name{font-size:15px;}
   .modal-price-val.p-red{font-size:15px;}
   .modal-price-row{font-size:13px;}
