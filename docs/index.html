@@ -2,7 +2,10 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#005f8a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>ゆいまーる商店｜沖縄特集 - がん共済アイリス会員様限定</title>
 <style>
 :root{
@@ -119,20 +122,93 @@ dialog::backdrop{background:rgba(0,30,50,.6);}
 .modal-cta:hover{opacity:.88;}
 footer{background:#0d2433;color:rgba(255,255,255,.6);text-align:center;padding:28px 20px;font-size:12px;line-height:1.9;}
 footer strong{color:rgba(255,255,255,.9);}
-@media(max-width:720px){
-  .modal-layout{grid-template-columns:1fr;max-height:none;overflow-y:auto;}
-  .modal-imgs{min-height:220px;}
-  .modal-main-img{max-height:240px;}
-  .hero{padding:36px 16px 32px;}
-  .products-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;}
-  .card-name{font-size:12px;}
-  .price-sale{font-size:17px;}
+/* ===== タブレット（〜768px） ===== */
+@media(max-width:768px){
+  /* ヒーロー */
+  .hero{padding:32px 16px 28px;}
+  .hero h1{font-size:clamp(22px,6vw,36px);}
+  .hero-desc{font-size:14px;}
+  .hero-stats{gap:10px;}
+  .hero-stat{padding:8px 14px;}
+  .hero-stat strong{font-size:18px;}
+
+  /* コントロールバー：縦積み */
+  .controls-bar{flex-direction:column;align-items:stretch;gap:8px;}
+  .search-box{max-width:100%;}
+  .sort-select,.clear-btn{width:100%;min-height:44px;}
+
+  /* フィルター：横スクロール */
+  .chips{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;scrollbar-width:none;}
+  .chips::-webkit-scrollbar{display:none;}
+  .chip span{white-space:nowrap;min-height:36px;}
+
+  /* グリッド */
+  .products-grid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;}
+
+  /* モーダル：縦積み */
+  dialog{width:100%;max-width:100%;border-radius:16px 16px 0 0;position:fixed;bottom:0;left:0;margin:0;}
+  dialog::backdrop{background:rgba(0,20,40,.7);}
+  .modal-layout{grid-template-columns:1fr;max-height:92dvh;overflow-y:auto;}
+  .modal-imgs{min-height:0;}
+  .modal-main-img{max-height:52vw;object-fit:cover;}
+  .modal-thumbs{padding:6px;}
+  .modal-info{padding:16px;}
 }
+
+/* ===== スマートフォン（〜480px） ===== */
 @media(max-width:480px){
-  .header-inner{padding:10px 14px;}
-  .logo-main{font-size:18px;}
+  /* ヘッダー */
+  .header-inner{padding:10px 14px;gap:8px;}
+  .logo-main{font-size:17px;}
+  .logo-sub{display:none;}
   .member-badge{font-size:10px;padding:4px 10px;}
+
+  /* ヒーロー */
+  .hero{padding:24px 14px 22px;}
+  .hero-tag{font-size:11px;padding:3px 12px;}
+  .hero h1{font-size:clamp(20px,7vw,28px);margin-bottom:8px;}
+  .hero-desc{font-size:13px;margin-bottom:14px;}
+  .hero-stats{gap:8px;}
+  .hero-stat{padding:7px 12px;flex:1;}
+  .hero-stat strong{font-size:16px;}
+  .hero-stat span{font-size:10px;}
+
+  /* ページ余白 */
+  .page-wrap{padding:16px 12px 80px;}
+
+  /* 検索 */
+  .search-box input{font-size:16px;} /* iOSズーム防止 */
+
+  /* フィルターラベル */
+  .filter-label{font-size:11px;}
+
+  /* グリッド：2列固定 */
   .products-grid{grid-template-columns:repeat(2,1fr);gap:10px;}
+
+  /* カード */
+  .card-body{padding:10px;}
+  .card-vendor{font-size:10px;}
+  .card-name{font-size:11px;-webkit-line-clamp:3;}
+  .card-prices{gap:1px;}
+  .price-label{font-size:9px;margin-bottom:3px;}
+  .price-row{grid-template-columns:3em 1fr;gap:2px;font-size:11px;}
+  .price-row-label{font-size:10px;}
+  .price-val{font-size:12px;}
+  .price-val.p-red{font-size:12px;}
+  .price-pct{font-size:10px;}
+  .card-cta{font-size:12px;padding:9px 0;min-height:40px;}
+
+  /* モーダル */
+  .modal-main-img{max-height:56vw;}
+  .modal-thumb{width:44px;height:44px;}
+  .modal-name{font-size:15px;}
+  .modal-price-val.p-red{font-size:16px;}
+  .modal-price-row{grid-template-columns:4em 1fr;font-size:13px;}
+  .modal-desc{font-size:12px;max-height:160px;}
+  .modal-cta{min-height:48px;font-size:14px;}
+
+  /* フッター */
+  footer{padding:20px 14px;font-size:11px;}
 }
 </style>
 </head>
@@ -332,6 +408,12 @@ grid.addEventListener('click', e => {
 });
 document.getElementById('modalClose').addEventListener('click', () => modal.close());
 modal.addEventListener('click', e => { if (e.target === modal) modal.close(); });
+// スマホ：スワイプダウンで閉じる
+let touchStartY = 0;
+modal.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; }, {passive:true});
+modal.addEventListener('touchend', e => {
+  if (e.changedTouches[0].clientY - touchStartY > 80) modal.close();
+}, {passive:true});
 document.getElementById('searchInput').addEventListener('input', e => { state.q = e.target.value.trim(); render(); });
 document.getElementById('sortSelect').addEventListener('change', e => { state.sort = e.target.value; render(); });
 document.getElementById('clearBtn').addEventListener('click', () => {
